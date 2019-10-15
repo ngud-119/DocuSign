@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/webjars/font-awesome/css/all.min.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/css/index.css}" />
+
+<title>E-signature</title>
+</head>
+<body>
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+	    <a class="navbar-brand" href="#" th:href="@{/}">Home</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    		<span class="navbar-toggler-icon"></span>
+  		</button>
+  		
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+		  <ul class="navbar-nav ml-auto">
+		  
+			<li class="nav-item dropdown">
+			  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    <span class="navbar-text" sec:authentication="principal.fullName">User</span>
+			  </a>
+			  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+			    <a class="dropdown-item" href="#" th:href="@{/logout}">Logout</a>
+			  </div>
+			</li>
+		  </ul>
+		</div>
+	</nav>
+	  
+	<br>
+	<br>
+	<div class="container">
+		
+		<h4>E-signature application - starting point for your electronic document flow with different document templates 
+		and e-sign providers. This demo include two template providers(local file and remote location by URL) and plugged-in e-sign 
+		document provider(DocuSign). Application built on
+		<a href="https://spring.io/projects/spring-boot">Spring Boot</a>
+		,
+		<a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/web.html">Spring MVC</a>
+		, 
+		 <a href="https://spring.io/projects/spring-security">Spring Security</a>
+		,
+		 <a href="https://spring.io/projects/spring-data-jpa">JPA</a>
+		 ,
+		 <a href="https://www.thymeleaf.org">Thymeleaf</a>
+		 <a href="https://getbootstrap.com/">(+Bootstrap)</a> and
+		<a href="https://developers.docusign.com" target="_blank">Docusign API.</a>		
+		</h4>
+
+
+		<div class="text-center">
+			<a href="#" data-toggle="modal"	data-target="#basicModal">
+				<i class="fas fa-file fa-2x" title="Create new document"></i>
+				</a>
+		</div>
+		<br>
+		<div th:replace="~{doctable :: docTable}"></div>
+
+		<!-- Create document popup -->
+		<div class="modal fade" id="basicModal" tabindex="-1" role="dialog"
+			aria-labelledby="basicModal" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<form th:action="@{/createdocument}" method="post" id="newDocForm">
+
+						<div class="modal-header">
+							<h4 class="modal-title" id="myModalLabel">Start new
+								E-Signature process</h4>
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+						</div>
+						<div class="modal-body">
+							<div th:if="${param.error}">
+								<div class="alert alert-danger">Invalid Deal UID.</div>
+							</div>
+							<div class="form-group">
+							 <label for="template">Select document template for signing</label>
+								<select class="form-control" id="templateId" name="templateId">
+									<option th:each="tmpl: ${templates}" th:value="${tmpl.id}" th:text="${tmpl.displayName()}">Default select</option>
+								</select>
+
+							</div>
+
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">Close</button>
+							<button type="button" class="btn btn-primary" id="submitNewDocBtn">Submit</button>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+
+		<!-- Sign document popup -->
+		<div class="modal fade" id="signDocModal" tabindex="-1" role="dialog"
+			aria-labelledby="signDocModal" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<form id="signDocForm" th:action="@{/sign}" action="#" method="post">
+
+						<div class="modal-header">
+							<h4 class="modal-title" id="myModalLabel">Sign Document</h4>
+							<button type="button" class="close" data-dismiss="modal"
+								aria-hidden="true">&times;</button>
+						</div>
+						<div class="modal-body">
+							<div th:if="${param.error}">
+								<div class="alert alert-danger">Invalid Deal UID.</div>
+							</div>
+							<div class="form-group">
+								<label for="docId" class="control-label">Document #</label>
+								<input id="docId" class="form-control" type="text" name="docId"	readonly="readonly" />
+								<label for="docId">Select E-sign provider for signing document</label>
+								<select class="form-control" id="eSignProvider" name="eSignProvider">
+									<option th:each="eSignProvider: ${eSignProviders}" th:value="${eSignProvider.providerAlias}"
+										th:text="${eSignProvider.providerName}">Default select</option>
+								</select>
+							</div>
+
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<button id="submitSignForm" type="button" class="btn btn-primary" onClick="this.disabled=true; this.innerText='Sending…';">Submit</button>
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+
+	<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js/}"></script>
+	<script type="text/javascript" th:src="@{/webjars/popper.js/umd/popper.min.js/}"></script>
+	<script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/index.js}"></script>
+</body>
+</html>

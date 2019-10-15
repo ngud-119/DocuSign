@@ -1,0 +1,17 @@
+[
+{"name": "World Wide Corp",
+	"body" : {
+		"anchorString" : "/sn1/",
+		"anchorUnits" : "pixels",
+		"anchorYOffset" : "20",
+		"anchorXOffset" : "10"
+	}
+},
+{"name" : "iCUvgNWKFqVBVLW2",
+	"body" : {
+		"anchorString" : "Signature",
+		"anchorUnits" : "pixels",
+		"anchorYOffset" : "-50",
+		"anchorXOffset" : "5"
+	}
+}]

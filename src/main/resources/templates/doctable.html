@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="utf-8" />
+</head>
+<body>
+	<div id="docsTable" th:fragment="docTable">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Name</th>
+					<th>File Name</th>
+					<th>Status</th>
+					<th>Signed At</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:if="${docs == null || docs.getSize() == 0}">
+					<td colspan="6">No Documents Available</td>
+				</tr>
+				<tr th:each="doc : ${docs}">
+					<td th:text="${doc.id}">Id</td>
+					<td th:text="${doc.template.displayName()}">Name</td>
+					<td th:text="${doc.fileName}">File Name</td>
+					<td th:text="${doc.status}">Status</td>
+					<td
+						th:text="${doc.esignInfo != null ? #temporals.format(doc.esignInfo.signedAt, 'dd, MMM yyyy HH:mm') : ''}">Signed
+						At</td>
+					<td>
+						<a th:if="${doc.status.name() == 'NEW'}" href=""
+							th:attr="data-docid=${doc.id}" onclick="fillSignDocForm(this)"
+							data-toggle="modal" data-target="#signDocModal"
+							class="btn btn-primary btn-sm active" role="button">
+							
+							<span class="fas fa-edit" title="Sign"></span>
+							
+						</a> 
+						<a th:if="${doc.status.name() == 'SIGNED'}"
+							th:href="@{/downloaddoc/?docId=__${doc.id}__}" href="#"
+							class="btn btn-primary btn-sm active" role="button">
+						
+						<span class="fas fa-download" title="Download"></span>
+						
+						</a></td>
+				</tr>
+
+			</tbody>
+		</table>
+
+	<nav aria-label="Pagination" th:if="${docs.totalPages gt 0}" 
+		th:with="start=${((docs.number/5))*5}, 
+				end=${(start + 4) > docs.totalPages -1 ? docs.totalPages -1 : (start + 4)}">
+		<ul class="pagination justify-content-center font-weight-medium">
+			<li class="page-item" th:classappend="${docs.number eq 0} ? 'disabled'">
+				<a class="page-link svg-icon" href="#" onclick="loadDocsPage(this)"
+					aria-label="Previous" title="Previous Page" rel="tooltip" th:attr="data-page=${docs.number lt 2 ? 1 : docs.number}">
+					<i class="fas fa-backward"></i>
+				</a>
+			</li>
+			<li class="page-item" th:classappend="${i eq docs.number + 1} ? 'active nonclicable'"
+				th:each="i : ${#numbers.sequence( start + 1, end + 1 , 1)}">
+				<a class="page-link" href="#" onclick="loadDocsPage(this)" th:text="${i}" th:attr="data-page=${i}"
+				th:title="${'Page '+ i}" rel="tooltip" ></a>
+			</li>
+			
+			<li class="page-item" th:classappend="${docs.number + 1 eq docs.totalPages} ? 'disabled'">
+				<a class="page-link svg-icon" href="#" onclick="loadDocsPage(this)"
+					aria-label="Next" title="Next Page" rel="tooltip" th:attr="data-page=${docs.number + 2}">
+					<i class="fas fa-forward"></i>
+			</a>
+			</li>
+		</ul>
+	</nav>
+
+	</div>
+
+</body>
+</html>

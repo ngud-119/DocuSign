@@ -1,0 +1,3 @@
+.nonclicable {
+    pointer-events: none;
+}
